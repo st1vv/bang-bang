@@ -29,7 +29,7 @@ export const CityBackground = () => {
   return (
     <svg
       aria-hidden="true"
-      className="fixed inset-0 -z-10 h-full w-full"
+      className="pointer-events-none fixed inset-0 -z-10 h-full w-full"
       viewBox="0 0 1440 900"
       preserveAspectRatio="xMidYMid slice"
     >

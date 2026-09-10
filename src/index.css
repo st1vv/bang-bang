@@ -28,17 +28,14 @@ body {
   0%,
   100% {
     opacity: 0.55;
-    transform: scale(0.85);
   }
   50% {
     opacity: 1;
-    transform: scale(1.15);
   }
 }
 
 .star-shine {
   animation: shine var(--duration, 3s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  transform-origin: center;
-  transform-box: fill-box;
+  will-change: opacity;
 }
