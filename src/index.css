@@ -1,1 +1,44 @@
 @import "tailwindcss";
+
+@theme {
+  --color-ink: #170f26;
+  --color-bg: #fbf9ff;
+  --color-surface: #f3effc;
+  --color-border: #e2d9f7;
+
+  --color-primary: #7c3aed;
+  --color-primary-dark: #5b21b6;
+  --color-primary-light: #a855f7;
+
+  --color-gold: #f5b301;
+
+  --color-cyan: #22d3ee;
+  --color-emerald: #10d9a0;
+  --color-pink: #ec4899;
+  --color-orange: #fb923c;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-ink);
+  background: var(--color-primary-dark);
+}
+
+@keyframes shine {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.star-shine {
+  animation: shine var(--duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  transform-origin: center;
+  transform-box: fill-box;
+}
