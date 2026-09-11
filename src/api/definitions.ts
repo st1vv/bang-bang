@@ -19,11 +19,6 @@ export type OpenSeaNftsResponse = {
   next: string | null;
 };
 
-export type NftsPage = {
-  nfts: Nft[];
-  next: string | null;
-};
-
 export type RarityNft = Nft & {
   rank: number;
 };

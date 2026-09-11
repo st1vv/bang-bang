@@ -61,3 +61,32 @@ body {
   animation: pixel-bounce 0.75s ease-in-out infinite;
   animation-delay: var(--delay, 0s);
 }
+
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-light) transparent;
+}
+
+/* WebKit ignores these once scrollbar-color is set, so they only kick in on
+   older Safari/Chrome that lack the standard properties. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-pink);
+  background-clip: content-box;
+}

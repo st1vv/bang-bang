@@ -3,7 +3,6 @@ import {
   CHAIN_ETHEREUM,
   COLLECTION_SLUG,
   type Nft,
-  type NftsPage,
   type OpenSeaNft,
   type OpenSeaNftsResponse,
   type RarityData,
@@ -33,21 +32,6 @@ export const fetchCollectionNfts = async (owner: string): Promise<Nft[]> => {
   } while (cursor);
 
   return nfts.map(toNft);
-};
-
-export const fetchAllNfts = async (
-  limit: number,
-  cursor?: string,
-): Promise<NftsPage> => {
-  const data = await openseaFetch<OpenSeaNftsResponse>({
-    path: `/collection/${COLLECTION_SLUG}/nfts`,
-    params: {
-      limit: String(limit),
-      ...(cursor ? { next: cursor } : {}),
-    },
-  });
-
-  return { nfts: data.nfts.map(toNft), next: data.next };
 };
 
 export const fetchRarity = async (): Promise<RarityData> => {

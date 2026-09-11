@@ -1,51 +1,63 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { COLLECTION_PAGE_SIZE } from "@/api/definitions";
 import { useGetCollectionNfts } from "@/api/nfts/get-collection";
-import { useGetAllNfts } from "@/api/nfts/get-all";
+import { useGetRarity } from "@/api/nfts/get-rarity";
 import { Spinner } from "@/shared/spinner";
 import { NftCard } from "@/shared/nft-card";
+import { SortFilter } from "@/shared/sort-filter";
 import { useInView } from "@/lib/use-in-view";
 import { useRarity } from "@/lib/use-rarity";
+import { sortNfts, type SortOption } from "@/lib/sort-nfts";
 
 export const HomePage = () => {
   const [address, setAddress] = useState("");
   const [submittedAddress, setSubmittedAddress] = useState("");
+  const [sort, setSort] = useState<SortOption>("tokenId");
+  const [visibleCount, setVisibleCount] = useState(COLLECTION_PAGE_SIZE);
   const isOwnerView = Boolean(submittedAddress);
+
   const rarity = useRarity();
+  const { data: rarityData, isLoading: isLoadingRarity } = useGetRarity();
 
   const {
-    data: ownedNfts = [],
+    data: ownedNfts,
     isFetching: isFetchingOwned,
     isError,
   } = useGetCollectionNfts(submittedAddress);
 
-  const {
-    data: collection,
-    isFetching: isFetchingCollection,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useGetAllNfts(!isOwnerView);
+  const sortedNfts = useMemo(() => {
+    const source = (isOwnerView ? ownedNfts : rarityData?.nfts) ?? [];
+    return sortNfts(source, sort, rarity);
+  }, [isOwnerView, ownedNfts, rarityData, sort, rarity]);
 
-  const collectionNfts = collection?.pages.flatMap((page) => page.nfts) ?? [];
-  const nfts = isOwnerView ? ownedNfts : collectionNfts;
-
-  const isInitialLoading = isOwnerView
-    ? isFetchingOwned
-    : isFetchingCollection && collectionNfts.length === 0;
+  const visibleNfts = sortedNfts.slice(0, visibleCount);
+  const hasMore = visibleNfts.length < sortedNfts.length;
+  const isInitialLoading = isOwnerView ? isFetchingOwned : isLoadingRarity;
 
   const loadMoreRef = useInView<HTMLDivElement>(() => {
-    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-  }, !isOwnerView && Boolean(hasNextPage));
+    setVisibleCount((count) => count + COLLECTION_PAGE_SIZE);
+  }, hasMore);
+
+  const resetPaging = () => setVisibleCount(COLLECTION_PAGE_SIZE);
+
+  const handleSortChange = (value: SortOption) => {
+    setSort(value);
+    resetPaging();
+  };
 
   const handleChange = (value: string) => {
     setAddress(value);
-    if (!value.trim()) setSubmittedAddress("");
+    if (!value.trim()) {
+      setSubmittedAddress("");
+      resetPaging();
+    }
   };
 
   const handleBlur = () => {
     const trimmed = address.trim();
     if (trimmed !== submittedAddress) {
       setSubmittedAddress(trimmed);
+      resetPaging();
     }
   };
 
@@ -69,6 +81,8 @@ export const HomePage = () => {
         className="w-full max-w-md rounded-lg border border-border bg-surface px-4 py-2 font-mono text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-primary"
       />
 
+      <SortFilter value={sort} onChange={handleSortChange} />
+
       {isInitialLoading && <Spinner />}
 
       {isError && (
@@ -77,15 +91,18 @@ export const HomePage = () => {
         </p>
       )}
 
-      {!isInitialLoading && !isError && isOwnerView && nfts.length === 0 && (
-        <p className="text-sm text-white/60">
-          No NFTs from this collection found for that address.
-        </p>
-      )}
+      {!isInitialLoading &&
+        !isError &&
+        isOwnerView &&
+        sortedNfts.length === 0 && (
+          <p className="text-sm text-white/60">
+            No NFTs from this collection found for that address.
+          </p>
+        )}
 
-      {!isInitialLoading && nfts.length > 0 && (
+      {!isInitialLoading && visibleNfts.length > 0 && (
         <div className="grid w-full max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {nfts.map((nft) => (
+          {visibleNfts.map((nft) => (
             <NftCard
               key={nft.tokenId}
               nft={nft}
@@ -95,9 +112,7 @@ export const HomePage = () => {
         </div>
       )}
 
-      {!isOwnerView && hasNextPage && <div ref={loadMoreRef} className="h-px" />}
-
-      {isFetchingNextPage && <Spinner />}
+      {hasMore && <div ref={loadMoreRef} className="h-px" />}
     </section>
   );
 };
