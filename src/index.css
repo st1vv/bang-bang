@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @theme {
+  --font-display: "Titan One", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+
   --color-ink: #170f26;
   --color-bg: #fbf9ff;
   --color-surface: #f3effc;
@@ -20,6 +23,7 @@
 
 body {
   min-height: 100vh;
+  font-family: var(--font-sans);
   color: var(--color-ink);
   background: var(--color-primary-dark);
 }

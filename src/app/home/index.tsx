@@ -21,7 +21,7 @@ export const HomePage = () => {
   return (
     <section className="flex flex-1 flex-col items-center gap-8 px-4 py-16 text-center">
       <div className="max-w-xl space-y-3">
-        <h1 className="text-3xl font-extrabold tracking-tight text-white lg:text-4xl">
+        <h1 className="font-display text-3xl tracking-tight text-white lg:text-4xl">
           View Your Bots
         </h1>
         <p className="text-sm text-white/70 lg:text-base">

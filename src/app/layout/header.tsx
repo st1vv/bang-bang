@@ -7,13 +7,13 @@ export const Header = () => {
         <img
           src="/bang-logo.svg"
           alt="Bang Bang"
-          className="h-9 w-auto lg:h-14"
+          className="h-10 w-auto lg:h-16"
         />
       </Link>
       <nav>
         <Link
           to="/"
-          className="text-sm font-mono font-semibold text-white/90 hover:text-cyan transition-colors"
+          className="font-display text-base text-white/90 hover:text-cyan transition-colors"
         >
           Home
         </Link>
