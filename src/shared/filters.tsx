@@ -57,7 +57,7 @@ export const Filters = ({
           <button
             type="button"
             onClick={onClearTraits}
-            className="text-xs text-white/50 transition-colors hover:text-white"
+            className="text-xs text-white/50 transition-colors hover:text-white cursor-pointer"
           >
             Clear
           </button>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { COLLECTION_PAGE_SIZE } from "@/api/definitions";
+import { COLLECTION_PAGE_SIZE, COLLECTION_URL } from "@/api/definitions";
 import { useGetCollectionNfts } from "@/api/nfts/get-collection";
 import { useGetRarity } from "@/api/nfts/get-rarity";
 import { Spinner } from "@/shared/spinner";
@@ -43,6 +43,7 @@ export const HomePage = () => {
   const visibleNfts = nfts.slice(0, visibleCount);
   const hasMore = visibleNfts.length < nfts.length;
   const isInitialLoading = isOwnerView ? isFetchingOwned : isLoadingRarity;
+  const isWalletEmpty = isOwnerView && sourceNfts.length === 0;
 
   const loadMoreRef = useInView<HTMLDivElement>(() => {
     setVisibleCount((count) => count + COLLECTION_PAGE_SIZE);
@@ -85,7 +86,16 @@ export const HomePage = () => {
     <section className="flex flex-1 flex-col items-center gap-6 px-4 py-16 text-center">
       <div className="max-w-xl space-y-3">
         <h1 className="font-display text-3xl tracking-tight text-white lg:text-4xl">
-          View Your Bots
+          View Your{" "}
+          <a
+            href={COLLECTION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="View the collection on OpenSea"
+            className="text-gold transition-colors hover:text-cyan"
+          >
+            Bots ↗
+          </a>
         </h1>
         <p className="text-sm text-white/70 lg:text-base">
           Paste your EVM address below to see your NFTs
@@ -121,11 +131,23 @@ export const HomePage = () => {
       )}
 
       {!isInitialLoading && !isError && nfts.length === 0 && (
-        <p className="text-sm text-white/60">
-          {isOwnerView
-            ? "No bots from this collection match that address."
-            : "No bots match these traits."}
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-white/60">
+            {isWalletEmpty
+              ? "This wallet doesn't hold any Banger Bots yet."
+              : "No bots match these traits."}
+          </p>
+          {isWalletEmpty && (
+            <a
+              href={COLLECTION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-full border border-gold bg-gold/20 px-4 py-1.5 text-xs text-gold transition-colors hover:bg-gold/30"
+            >
+              Grab one on OpenSea ↗
+            </a>
+          )}
+        </div>
       )}
 
       {!isInitialLoading && visibleNfts.length > 0 && (
