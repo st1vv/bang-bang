@@ -13,7 +13,7 @@ export const SortFilter = ({ value, onChange }: SortFilterProps) => {
           key={option.value}
           type="button"
           onClick={() => onChange(option.value)}
-          className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+          className={`rounded-full border px-3 py-1 text-xs transition-colors cursor-pointer ${
             value === option.value
               ? "border-gold bg-gold/20 text-gold"
               : "border-white/15 text-white/70 hover:border-white/40 hover:text-white"

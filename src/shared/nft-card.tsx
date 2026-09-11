@@ -1,4 +1,4 @@
-import type { Nft } from "@/api/definitions";
+import { CHAIN_ETHEREUM, CONTRACT_ADDRESS, type Nft } from "@/api/definitions";
 import type { NftRarity } from "@/lib/use-rarity";
 
 type NftCardProps = {
@@ -21,13 +21,24 @@ const rarityClasses = (percentile: number) =>
 
 export const NftCard = ({ nft, rarity }: NftCardProps) => {
   return (
-    <div className="overflow-hidden rounded-xl border border-white/15 bg-white/5">
-      <img
-        src={nft.image}
-        alt={nft.name}
-        loading="lazy"
-        className="aspect-square w-full object-cover"
-      />
+    <a
+      href={`https://opensea.io/item/${CHAIN_ETHEREUM}/${CONTRACT_ADDRESS}/${nft.tokenId}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`View ${nft.name} on OpenSea`}
+      className="group block overflow-hidden rounded-xl border border-white/15 bg-white/5 transition-colors hover:border-cyan"
+    >
+      <div className="relative overflow-hidden">
+        <img
+          src={nft.image}
+          alt={nft.name}
+          loading="lazy"
+          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <span className="absolute right-2 top-2 rounded-md bg-ink/80 px-1.5 py-0.5 font-mono text-[10px] text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+          OpenSea ↗
+        </span>
+      </div>
       <div className="flex items-center justify-between gap-2 px-2 py-2">
         <p className="truncate font-mono text-xs text-white/80">{nft.name}</p>
         {rarity && (
@@ -39,6 +50,6 @@ export const NftCard = ({ nft, rarity }: NftCardProps) => {
           </span>
         )}
       </div>
-    </div>
+    </a>
   );
 };

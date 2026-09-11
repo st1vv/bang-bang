@@ -15,7 +15,7 @@ export const Header = () => {
           to="/"
           className="font-display text-base text-white/90 hover:text-cyan transition-colors"
         >
-          Home
+          Banger Bots
         </Link>
       </nav>
     </header>
