@@ -8,13 +8,20 @@ const seededRandom = (seed: number) => {
 
 const random = seededRandom(42);
 
-const STARS = Array.from({ length: 60 }, (_, i) => {
+const STAR_COUNT = 60;
+const ANIMATED_EVERY = 6;
+const STATIC_OPACITY = 0.7;
+
+const STARS = Array.from({ length: STAR_COUNT }, (_, i) => {
   const isSparkle = i % 10 === 0;
   return {
     x: random() * 1440,
     y: random() * 900,
     size: isSparkle ? 6 + random() * 7 : 1 + random() * 1.5,
     isSparkle,
+    // Only a tenth of the sky keeps animating — a full field of infinite
+    // animations makes every repaint above it (blur, scroll, selection) crawl.
+    isAnimated: i % ANIMATED_EVERY === 0,
     duration: 2 + random() * 3,
     delay: random() * 4,
   };
@@ -42,37 +49,35 @@ export const CityBackground = () => {
 
       <rect width="1440" height="900" fill="url(#city-sky)" />
 
-      {STARS.map((star, i) =>
-        star.isSparkle ? (
-          <path
-            key={i}
-            className="star-shine"
-            style={
-              {
+      {STARS.map((star, i) => {
+        const animation = star.isAnimated
+          ? {
+              className: "star-shine",
+              style: {
                 "--duration": `${star.duration}s`,
                 "--delay": `${star.delay}s`,
-              } as React.CSSProperties
+              } as React.CSSProperties,
             }
+          : { opacity: STATIC_OPACITY };
+
+        return star.isSparkle ? (
+          <path
+            key={i}
+            {...animation}
             d={sparklePath(star.x, star.y, star.size)}
             fill="white"
           />
         ) : (
           <circle
             key={i}
-            className="star-shine"
-            style={
-              {
-                "--duration": `${star.duration}s`,
-                "--delay": `${star.delay}s`,
-              } as React.CSSProperties
-            }
+            {...animation}
             cx={star.x}
             cy={star.y}
             r={star.size}
             fill="white"
           />
-        ),
-      )}
+        );
+      })}
     </svg>
   );
 };

@@ -3,15 +3,17 @@ import { COLLECTION_PAGE_SIZE, COLLECTION_URL } from "@/api/definitions";
 import { useGetCollectionNfts } from "@/api/nfts/get-collection";
 import { useGetRarity } from "@/api/nfts/get-rarity";
 import { Spinner } from "@/shared/spinner";
+import { AddressInput } from "@/shared/address-input";
 import { NftCard } from "@/shared/nft-card";
 import { Filters } from "@/shared/filters";
 import { useInView } from "@/lib/use-in-view";
+import { useAddressParam } from "@/lib/use-address-param";
 import { sortNfts, type SortOption } from "@/lib/sort-nfts";
 import { filterNfts, toggleTrait, type TraitFilters } from "@/lib/filter-nfts";
 
 export const HomePage = () => {
-  const [address, setAddress] = useState("");
-  const [submittedAddress, setSubmittedAddress] = useState("");
+  const { address, setAddress, submittedAddress, submitAddress } =
+    useAddressParam();
   const [sort, setSort] = useState<SortOption>("tokenId");
   const [traitFilters, setTraitFilters] = useState<TraitFilters>({});
   const [visibleCount, setVisibleCount] = useState(COLLECTION_PAGE_SIZE);
@@ -21,7 +23,7 @@ export const HomePage = () => {
 
   const {
     data: ownedNfts,
-    isFetching: isFetchingOwned,
+    isLoading: isLoadingOwned,
     isError,
   } = useGetCollectionNfts(submittedAddress);
 
@@ -40,9 +42,11 @@ export const HomePage = () => {
     [sourceNfts, traitFilters, sort],
   );
 
-  const visibleNfts = nfts.slice(0, visibleCount);
+  // The biggest wallet holds under a hundred bots, so only the 5555-item
+  // collection view needs paging.
+  const visibleNfts = isOwnerView ? nfts : nfts.slice(0, visibleCount);
   const hasMore = visibleNfts.length < nfts.length;
-  const isInitialLoading = isOwnerView ? isFetchingOwned : isLoadingRarity;
+  const isInitialLoading = isOwnerView ? isLoadingOwned : isLoadingRarity;
   const isWalletEmpty = isOwnerView && sourceNfts.length === 0;
 
   const loadMoreRef = useInView<HTMLDivElement>(() => {
@@ -69,15 +73,14 @@ export const HomePage = () => {
   const handleChange = (value: string) => {
     setAddress(value);
     if (!value.trim()) {
-      setSubmittedAddress("");
+      submitAddress("");
       resetPaging();
     }
   };
 
   const handleBlur = () => {
-    const trimmed = address.trim();
-    if (trimmed !== submittedAddress) {
-      setSubmittedAddress(trimmed);
+    if (address.trim() !== submittedAddress) {
+      submitAddress(address);
       resetPaging();
     }
   };
@@ -102,13 +105,10 @@ export const HomePage = () => {
         </p>
       </div>
 
-      <input
-        type="text"
+      <AddressInput
         value={address}
-        onChange={(event) => handleChange(event.target.value)}
+        onChange={handleChange}
         onBlur={handleBlur}
-        placeholder="0x..."
-        className="w-full max-w-md rounded-lg border border-border bg-surface px-4 py-2 font-mono text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-primary"
       />
 
       {rarityData && (

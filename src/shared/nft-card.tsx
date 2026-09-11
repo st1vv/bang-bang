@@ -3,6 +3,7 @@ import {
   CONTRACT_ADDRESS,
   type RarityNft,
 } from "@/api/definitions";
+import { thumbnailUrl } from "@/lib/image-url";
 
 type NftCardProps = {
   nft: RarityNft;
@@ -35,9 +36,10 @@ export const NftCard = ({ nft, total }: NftCardProps) => {
     >
       <div className="relative overflow-hidden">
         <img
-          src={nft.image}
+          src={thumbnailUrl(nft.image, 250)}
           alt={nft.name}
           loading="lazy"
+          decoding="async"
           className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <span className="absolute right-2 top-2 rounded-md bg-ink/80 px-1.5 py-0.5 font-mono text-[10px] text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
