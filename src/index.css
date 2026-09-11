@@ -90,3 +90,15 @@ html {
   background: var(--color-pink);
   background-clip: content-box;
 }
+
+.logo {
+  color: #fff;
+  /* paint-order keeps the stroke behind the fill so the letters stay full */
+  -webkit-text-stroke: 0.1em #000;
+  paint-order: stroke fill;
+  text-shadow: 0.05em 0.06em 0 #000;
+}
+
+.logo-accent {
+  color: #ffb020;
+}
