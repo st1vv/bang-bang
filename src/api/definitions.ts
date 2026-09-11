@@ -20,11 +20,15 @@ export type OpenSeaNftsResponse = {
   next: string | null;
 };
 
+export type TraitCounts = Record<string, Record<string, number>>;
+
 export type RarityNft = Nft & {
   rank: number;
+  traits: Record<string, string>;
 };
 
 export type RarityData = {
   total: number;
+  traitCounts: TraitCounts;
   nfts: RarityNft[];
 };

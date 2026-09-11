@@ -57,26 +57,28 @@ const noneCounts = Object.fromEntries(
   }),
 );
 
-const scoreOf = (nft) => {
-  const traitsByCategory = new Map(
-    nft.traits.map((trait) => [trait.trait_type, trait.value]),
-  );
+const traitsOf = (nft) =>
+  Object.fromEntries(nft.traits.map((trait) => [trait.trait_type, trait.value]));
 
-  return Object.entries(counts).reduce((score, [category, values]) => {
-    const value = traitsByCategory.get(category);
+const scoreOf = (traits) =>
+  Object.entries(counts).reduce((score, [category, values]) => {
+    const value = traits[category];
     const count = value === undefined ? noneCounts[category] : values[value];
     if (!count) return score;
     return score - Math.log2(count / total);
   }, 0);
-};
 
 const scored = nfts
-  .map((nft) => ({
-    tokenId: nft.identifier,
-    name: nft.name || `#${nft.identifier}`,
-    image: nft.image_url ?? "",
-    score: scoreOf(nft),
-  }))
+  .map((nft) => {
+    const traits = traitsOf(nft);
+    return {
+      tokenId: nft.identifier,
+      name: nft.name || `#${nft.identifier}`,
+      image: nft.image_url ?? "",
+      traits,
+      score: scoreOf(traits),
+    };
+  })
   .sort((a, b) => b.score - a.score || Number(a.tokenId) - Number(b.tokenId));
 
 const ranked = scored.map(({ score, ...nft }, index) => ({
@@ -86,7 +88,7 @@ const ranked = scored.map(({ score, ...nft }, index) => ({
 
 await writeFile(
   OUTPUT_PATH,
-  JSON.stringify({ total, nfts: ranked }),
+  JSON.stringify({ total, traitCounts: counts, nfts: ranked }),
   "utf8",
 );
 

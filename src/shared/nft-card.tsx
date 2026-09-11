@@ -1,9 +1,12 @@
-import { CHAIN_ETHEREUM, CONTRACT_ADDRESS, type Nft } from "@/api/definitions";
-import type { NftRarity } from "@/lib/use-rarity";
+import {
+  CHAIN_ETHEREUM,
+  CONTRACT_ADDRESS,
+  type RarityNft,
+} from "@/api/definitions";
 
 type NftCardProps = {
-  nft: Nft;
-  rarity?: NftRarity;
+  nft: RarityNft;
+  total: number;
 };
 
 const RARITY_TIERS = [
@@ -19,7 +22,9 @@ const rarityClasses = (percentile: number) =>
   RARITY_TIERS.find((tier) => percentile <= tier.maxPercentile)?.classes ??
   COMMON_TIER;
 
-export const NftCard = ({ nft, rarity }: NftCardProps) => {
+export const NftCard = ({ nft, total }: NftCardProps) => {
+  const percentile = nft.rank / total;
+
   return (
     <a
       href={`https://opensea.io/item/${CHAIN_ETHEREUM}/${CONTRACT_ADDRESS}/${nft.tokenId}`}
@@ -41,14 +46,12 @@ export const NftCard = ({ nft, rarity }: NftCardProps) => {
       </div>
       <div className="flex items-center justify-between gap-2 px-2 py-2">
         <p className="truncate font-mono text-xs text-white/80">{nft.name}</p>
-        {rarity && (
-          <span
-            title={`Top ${(rarity.percentile * 100).toFixed(1)}%`}
-            className={`shrink-0 rounded-md px-1.5 py-0.5 font-mono text-xs ${rarityClasses(rarity.percentile)}`}
-          >
-            #{rarity.rank}
-          </span>
-        )}
+        <span
+          title={`Top ${(percentile * 100).toFixed(1)}%`}
+          className={`shrink-0 rounded-md px-1.5 py-0.5 font-mono text-xs ${rarityClasses(percentile)}`}
+        >
+          #{nft.rank}
+        </span>
       </div>
     </a>
   );
