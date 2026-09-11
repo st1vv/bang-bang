@@ -43,3 +43,21 @@ body {
   animation-delay: var(--delay, 0s);
   will-change: opacity;
 }
+
+@keyframes pixel-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+.pixel-bounce {
+  display: inline-block;
+  animation: pixel-bounce 0.75s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}

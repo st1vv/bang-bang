@@ -1,19 +1,50 @@
 import { useState } from "react";
 import { useGetCollectionNfts } from "@/api/nfts/get-collection";
+import { useGetAllNfts } from "@/api/nfts/get-all";
+import { Spinner } from "@/shared/spinner";
+import { NftCard } from "@/shared/nft-card";
+import { useInView } from "@/lib/use-in-view";
+import { useRarity } from "@/lib/use-rarity";
 
 export const HomePage = () => {
   const [address, setAddress] = useState("");
   const [submittedAddress, setSubmittedAddress] = useState("");
+  const isOwnerView = Boolean(submittedAddress);
+  const rarity = useRarity();
 
   const {
-    data: nfts = [],
-    isFetching,
+    data: ownedNfts = [],
+    isFetching: isFetchingOwned,
     isError,
   } = useGetCollectionNfts(submittedAddress);
 
+  const {
+    data: collection,
+    isFetching: isFetchingCollection,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useGetAllNfts(!isOwnerView);
+
+  const collectionNfts = collection?.pages.flatMap((page) => page.nfts) ?? [];
+  const nfts = isOwnerView ? ownedNfts : collectionNfts;
+
+  const isInitialLoading = isOwnerView
+    ? isFetchingOwned
+    : isFetchingCollection && collectionNfts.length === 0;
+
+  const loadMoreRef = useInView<HTMLDivElement>(() => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+  }, !isOwnerView && Boolean(hasNextPage));
+
+  const handleChange = (value: string) => {
+    setAddress(value);
+    if (!value.trim()) setSubmittedAddress("");
+  };
+
   const handleBlur = () => {
     const trimmed = address.trim();
-    if (trimmed && trimmed !== submittedAddress) {
+    if (trimmed !== submittedAddress) {
       setSubmittedAddress(trimmed);
     }
   };
@@ -32,13 +63,13 @@ export const HomePage = () => {
       <input
         type="text"
         value={address}
-        onChange={(event) => setAddress(event.target.value)}
+        onChange={(event) => handleChange(event.target.value)}
         onBlur={handleBlur}
         placeholder="0x..."
         className="w-full max-w-md rounded-lg border border-border bg-surface px-4 py-2 font-mono text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-primary"
       />
 
-      {isFetching && <p className="text-sm text-white/60">Loading...</p>}
+      {isInitialLoading && <Spinner />}
 
       {isError && (
         <p className="text-sm text-pink">
@@ -46,31 +77,27 @@ export const HomePage = () => {
         </p>
       )}
 
-      {!isFetching && !isError && submittedAddress && nfts.length === 0 && (
+      {!isInitialLoading && !isError && isOwnerView && nfts.length === 0 && (
         <p className="text-sm text-white/60">
           No NFTs from this collection found for that address.
         </p>
       )}
 
-      {nfts.length > 0 && (
+      {!isInitialLoading && nfts.length > 0 && (
         <div className="grid w-full max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {nfts.map((nft) => (
-            <div
+            <NftCard
               key={nft.tokenId}
-              className="overflow-hidden rounded-xl border border-white/15 bg-white/5"
-            >
-              <img
-                src={nft.image}
-                alt={nft.name}
-                className="aspect-square w-full object-cover"
-              />
-              <p className="px-2 py-2 text-xs font-mono text-white/80">
-                {nft.name}
-              </p>
-            </div>
+              nft={nft}
+              rarity={rarity.get(nft.tokenId)}
+            />
           ))}
         </div>
       )}
+
+      {!isOwnerView && hasNextPage && <div ref={loadMoreRef} className="h-px" />}
+
+      {isFetchingNextPage && <Spinner />}
     </section>
   );
 };
