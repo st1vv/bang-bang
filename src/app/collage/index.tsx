@@ -49,7 +49,7 @@ export const CollagePage = () => {
     }
   };
 
-  const handleAddressBlur = () => {
+  const handleAddressSearch = () => {
     if (address.trim() !== submittedAddress) {
       submitAddress(address);
       reset();
@@ -70,7 +70,7 @@ export const CollagePage = () => {
       <AddressInput
         value={address}
         onChange={handleAddressChange}
-        onBlur={handleAddressBlur}
+        onSubmit={handleAddressSearch}
       />
 
       {isLoading && <Spinner />}

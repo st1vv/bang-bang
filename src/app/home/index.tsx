@@ -78,7 +78,7 @@ export const HomePage = () => {
     }
   };
 
-  const handleBlur = () => {
+  const handleSearch = () => {
     if (address.trim() !== submittedAddress) {
       submitAddress(address);
       resetPaging();
@@ -108,7 +108,7 @@ export const HomePage = () => {
       <AddressInput
         value={address}
         onChange={handleChange}
-        onBlur={handleBlur}
+        onSubmit={handleSearch}
       />
 
       {rarityData && (
