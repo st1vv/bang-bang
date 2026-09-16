@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
-import type { RarityNft } from "@/api/definitions";
+import type { CollectionNft } from "@/api/definitions";
 
 export const GRID_SIZES = [2, 3, 4, 5, 6];
 const SMALLEST_SIZE = GRID_SIZES[0];
 
-export const useCollageSelection = (nfts: RarityNft[]) => {
+export const useCollageSelection = (nfts: CollectionNft[]) => {
   const [chosenColumns, setChosenColumns] = useState<number | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -19,11 +19,11 @@ export const useCollageSelection = (nfts: RarityNft[]) => {
 
   const selectedNfts = useMemo(
     () =>
-      selectedIds.flatMap((id) => nfts.find((nft) => nft.tokenId === id) ?? []),
+      selectedIds.flatMap((id) => nfts.find((nft) => nft.uid === id) ?? []),
     [selectedIds, nfts],
   );
 
-  // A wallet can only fill a grid it has enough bots for; the smallest grid
+  // A wallet can only fill a grid it has enough NFTs for; the smallest grid
   // stays available so there is always something to build.
   const isSizeAvailable = useCallback(
     (size: number) =>
@@ -37,10 +37,10 @@ export const useCollageSelection = (nfts: RarityNft[]) => {
   }, []);
 
   const toggle = useCallback(
-    (tokenId: string) => {
+    (uid: string) => {
       setSelectedIds((ids) => {
-        if (ids.includes(tokenId)) return ids.filter((id) => id !== tokenId);
-        return ids.length < capacity ? [...ids, tokenId] : ids;
+        if (ids.includes(uid)) return ids.filter((id) => id !== uid);
+        return ids.length < capacity ? [...ids, uid] : ids;
       });
     },
     [capacity],
@@ -54,7 +54,7 @@ export const useCollageSelection = (nfts: RarityNft[]) => {
 
     while (picked.length < capacity && pool.length) {
       const [nft] = pool.splice(Math.floor(Math.random() * pool.length), 1);
-      picked.push(nft.tokenId);
+      picked.push(nft.uid);
     }
 
     setSelectedIds(picked);

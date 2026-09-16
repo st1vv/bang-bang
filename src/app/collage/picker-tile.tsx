@@ -1,21 +1,21 @@
 import { memo } from "react";
-import type { RarityNft } from "@/api/definitions";
+import type { CollectionNft } from "@/api/definitions";
 import { thumbnailUrl } from "@/lib/image-url";
 
 type PickerTileProps = {
-  nft: RarityNft;
+  nft: CollectionNft;
   order: number;
-  onToggle: (tokenId: string) => void;
+  onToggle: (uid: string) => void;
 };
 
-// Memoised so picking a bot re-renders that tile instead of the whole wallet.
+// Memoised so picking one re-renders that tile instead of the whole wallet.
 export const PickerTile = memo(({ nft, order, onToggle }: PickerTileProps) => {
   const isSelected = order !== -1;
 
   return (
     <button
       type="button"
-      onClick={() => onToggle(nft.tokenId)}
+      onClick={() => onToggle(nft.uid)}
       title={nft.name}
       className={`relative cursor-pointer overflow-hidden rounded-lg border transition-colors ${
         isSelected ? "border-gold" : "border-white/15 hover:border-white/40"

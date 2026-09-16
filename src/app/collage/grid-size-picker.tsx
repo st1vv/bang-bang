@@ -25,7 +25,7 @@ export const GridSizePicker = ({
             title={
               isAvailable
                 ? undefined
-                : `Needs ${size * size} bots in the wallet`
+                : `Needs ${size * size} NFTs in the wallet`
             }
             className={`cursor-pointer rounded-full border px-3 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
               columns === size

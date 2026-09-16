@@ -1,4 +1,4 @@
-import type { RarityNft } from "@/api/definitions";
+import type { CollectionNft } from "@/api/definitions";
 
 const CELL_SIZE = 512;
 const MAX_CANVAS_SIZE = 2048;
@@ -21,7 +21,7 @@ const loadImage = (src: string) =>
   });
 
 export const renderCollage = async (
-  nfts: RarityNft[],
+  nfts: CollectionNft[],
   columns: number,
 ): Promise<Blob> => {
   const cellSize = cellSizeFor(columns);

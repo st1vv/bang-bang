@@ -1,8 +1,8 @@
-import type { RarityNft } from "@/api/definitions";
+import type { CollectionNft } from "@/api/definitions";
 import { thumbnailUrl } from "@/lib/image-url";
 
 type CollagePreviewProps = {
-  nfts: RarityNft[];
+  nfts: CollectionNft[];
   columns: number;
 };
 
@@ -17,12 +17,12 @@ export const CollagePreview = ({ nfts, columns }: CollagePreviewProps) => {
       {Array.from({ length: columns * columns }, (_, index) => {
         const nft = nfts[index];
 
-        // Keyed by bot, not by position: removing one from the middle then
+        // Keyed by token, not by position: removing one from the middle then
         // moves the existing images instead of rewriting every later cell's
         // src and decoding them all over again.
         return nft ? (
           <img
-            key={`bot-${nft.tokenId}`}
+            key={`nft-${nft.uid}`}
             src={thumbnailUrl(nft.image, 250)}
             alt={nft.name}
             decoding="async"

@@ -1,8 +1,12 @@
 import { useCallback, useState } from "react";
-import type { RarityNft } from "@/api/definitions";
+import type { CollectionNft } from "@/api/definitions";
 import { renderCollage } from "@/lib/render-collage";
 
-export const useCollageExport = (nfts: RarityNft[], columns: number) => {
+export const useCollageExport = (
+  nfts: CollectionNft[],
+  columns: number,
+  fileNamePrefix: string,
+) => {
   const [status, setStatus] = useState("");
   const [isExporting, setIsExporting] = useState(false);
 
@@ -14,7 +18,7 @@ export const useCollageExport = (nfts: RarityNft[], columns: number) => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `banger-bots-collage-${columns}x${columns}.png`;
+      link.download = `${fileNamePrefix}-collage-${columns}x${columns}.png`;
       link.click();
       URL.revokeObjectURL(url);
       setStatus("Saved");
@@ -23,7 +27,7 @@ export const useCollageExport = (nfts: RarityNft[], columns: number) => {
     } finally {
       setIsExporting(false);
     }
-  }, [nfts, columns]);
+  }, [nfts, columns, fileNamePrefix]);
 
   const copy = useCallback(async () => {
     setIsExporting(true);

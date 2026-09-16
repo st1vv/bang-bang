@@ -68,6 +68,13 @@ export type RarityNft = Nft & {
   traits: Record<string, string>;
 };
 
+// Token ids restart at 1 in every collection, so anything mixing them needs
+// the composite uid as its key.
+export type CollectionNft = RarityNft & {
+  collectionKey: string;
+  uid: string;
+};
+
 export type RarityData = {
   total: number;
   traitCounts: TraitCounts;

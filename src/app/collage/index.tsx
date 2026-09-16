@@ -1,12 +1,17 @@
-import { useCallback } from "react";
-import { BANGER_BOTS } from "@/api/definitions";
+import { useCallback, useMemo, useState } from "react";
+import { BANGER_BOTS, LIL_BANGERS } from "@/api/definitions";
 import { useOwnedNfts } from "@/lib/use-owned-nfts";
 import { useAddressParam } from "@/lib/use-address-param";
 import { AddressInput } from "@/shared/address-input";
 import { Spinner } from "@/shared/spinner";
 import { CollageActions } from "@/app/collage/collage-actions";
 import { CollagePreview } from "@/app/collage/collage-preview";
+import {
+  COLLAGE_SOURCES,
+  type CollageSource,
+} from "@/app/collage/collage-sources";
 import { GridSizePicker } from "@/app/collage/grid-size-picker";
+import { SourcePicker } from "@/app/collage/source-picker";
 import { PickerTile } from "@/app/collage/picker-tile";
 import { useCollageExport } from "@/app/collage/use-collage-export";
 import { useCollageSelection } from "@/app/collage/use-collage-selection";
@@ -14,10 +19,17 @@ import { useCollageSelection } from "@/app/collage/use-collage-selection";
 export const CollagePage = () => {
   const { address, setAddress, submittedAddress, submitAddress } =
     useAddressParam();
-  const { nfts, isLoading, isError } = useOwnedNfts(
-    BANGER_BOTS,
-    submittedAddress,
-  );
+  const [source, setSource] = useState<CollageSource>("bots");
+  const { hasBots, hasLil, fileNamePrefix, emptyLabel } =
+    COLLAGE_SOURCES[source];
+
+  const bots = useOwnedNfts(BANGER_BOTS, submittedAddress, hasBots);
+  const lil = useOwnedNfts(LIL_BANGERS, submittedAddress, hasLil);
+
+  // Bots first, then lil bangers — the picker keeps each collection together.
+  const nfts = useMemo(() => [...bots.nfts, ...lil.nfts], [bots.nfts, lil.nfts]);
+  const isLoading = bots.isLoading || lil.isLoading;
+  const isError = bots.isError || lil.isError;
 
   const {
     columns,
@@ -35,6 +47,7 @@ export const CollagePage = () => {
   const { status, isExporting, download, copy, resetStatus } = useCollageExport(
     selectedNfts,
     columns,
+    fileNamePrefix,
   );
 
   const handleToggle = useCallback(
@@ -44,6 +57,15 @@ export const CollagePage = () => {
     },
     [resetStatus, toggle],
   );
+
+  // Ids are collection-scoped, and the grid size was picked for the previous
+  // wallet size, so switching sources starts the collage over.
+  const handleSourceChange = (value: CollageSource) => {
+    if (value === source) return;
+    setSource(value);
+    resetStatus();
+    reset();
+  };
 
   const handleAddressChange = (value: string) => {
     setAddress(value);
@@ -67,7 +89,7 @@ export const CollagePage = () => {
           Collage Editor
         </h1>
         <p className="text-sm text-white/70 lg:text-base">
-          Paste your EVM address, pick your bots and build a collage
+          Paste your EVM address, pick your NFTs and build a collage
         </p>
       </div>
 
@@ -76,6 +98,8 @@ export const CollagePage = () => {
         onChange={handleAddressChange}
         onSubmit={handleAddressSearch}
       />
+
+      <SourcePicker source={source} onChange={handleSourceChange} />
 
       {isLoading && <Spinner />}
 
@@ -87,7 +111,7 @@ export const CollagePage = () => {
 
       {!isLoading && !isError && submittedAddress && nfts.length === 0 && (
         <p className="text-sm text-white/60">
-          This wallet doesn't hold any {BANGER_BOTS.name} yet.
+          This wallet doesn't hold any {emptyLabel} yet.
         </p>
       )}
 
@@ -97,7 +121,7 @@ export const CollagePage = () => {
             Enter your address to start
           </p>
           <p className="text-xs text-white/50">
-            Paste an EVM address above and pick the bots for your collage
+            Paste an EVM address above and pick the NFTs for your collage
           </p>
         </div>
       )}
@@ -130,9 +154,9 @@ export const CollagePage = () => {
             <div className="grid grid-cols-3 gap-3 lg:grid-cols-4">
               {nfts.map((nft) => (
                 <PickerTile
-                  key={nft.tokenId}
+                  key={nft.uid}
                   nft={nft}
-                  order={selectedIds.indexOf(nft.tokenId)}
+                  order={selectedIds.indexOf(nft.uid)}
                   onToggle={handleToggle}
                 />
               ))}
