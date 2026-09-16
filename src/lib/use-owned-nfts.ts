@@ -1,10 +1,16 @@
 import { useMemo } from "react";
+import type { Collection } from "@/api/definitions";
 import { useGetCollectionNfts } from "@/api/nfts/get-collection";
 import { useGetRarity } from "@/api/nfts/get-rarity";
 
-export const useOwnedNfts = (owner: string) => {
-  const { data: rarityData, isLoading: isLoadingRarity } = useGetRarity();
-  const { data: ownedNfts, isLoading, isError } = useGetCollectionNfts(owner);
+export const useOwnedNfts = (collection: Collection, owner: string) => {
+  const { data: rarityData, isLoading: isLoadingRarity } =
+    useGetRarity(collection);
+  const {
+    data: ownedNfts,
+    isLoading,
+    isError,
+  } = useGetCollectionNfts(collection, owner);
 
   const nfts = useMemo(() => {
     if (!owner) return [];

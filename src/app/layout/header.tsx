@@ -15,9 +15,12 @@ export const Header = () => {
       <NavLink to={{ pathname: "/", search }}>
         <Logo />
       </NavLink>
-      <nav className="flex items-center gap-4">
+      <nav className="flex items-center gap-3 lg:gap-4">
         <NavLink to={{ pathname: "/", search }} end className={navLinkClasses}>
           Banger Bots
+        </NavLink>
+        <NavLink to={{ pathname: "/lil", search }} className={navLinkClasses}>
+          Lil&apos; Bangers
         </NavLink>
         <NavLink
           to={{ pathname: "/collage", search }}

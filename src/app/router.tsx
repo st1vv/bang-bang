@@ -1,6 +1,7 @@
 import { createBrowserRouter, redirect } from "react-router";
 import { Layout } from "@/app/layout";
 import { HomePage } from "@/app/home";
+import { LilBangersPage } from "@/app/lil";
 import { CollagePage } from "@/app/collage";
 
 export const router = createBrowserRouter([
@@ -9,6 +10,7 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: "lil", element: <LilBangersPage /> },
       { path: "collage", element: <CollagePage /> },
       // Anything else lands back on the collection.
       { path: "*", loader: () => redirect("/") },

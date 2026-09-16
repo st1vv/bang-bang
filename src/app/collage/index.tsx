@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { BANGER_BOTS } from "@/api/definitions";
 import { useOwnedNfts } from "@/lib/use-owned-nfts";
 import { useAddressParam } from "@/lib/use-address-param";
 import { AddressInput } from "@/shared/address-input";
@@ -13,7 +14,10 @@ import { useCollageSelection } from "@/app/collage/use-collage-selection";
 export const CollagePage = () => {
   const { address, setAddress, submittedAddress, submitAddress } =
     useAddressParam();
-  const { nfts, isLoading, isError } = useOwnedNfts(submittedAddress);
+  const { nfts, isLoading, isError } = useOwnedNfts(
+    BANGER_BOTS,
+    submittedAddress,
+  );
 
   const {
     columns,
@@ -83,7 +87,7 @@ export const CollagePage = () => {
 
       {!isLoading && !isError && submittedAddress && nfts.length === 0 && (
         <p className="text-sm text-white/60">
-          This wallet doesn't hold any Banger Bots yet.
+          This wallet doesn't hold any {BANGER_BOTS.name} yet.
         </p>
       )}
 

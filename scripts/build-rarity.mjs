@@ -1,8 +1,22 @@
 import { writeFile, readFile } from "node:fs/promises";
 
-const COLLECTION_SLUG = "banger-bots";
+// Keep this in sync with COLLECTIONS in src/api/definitions.ts.
+const COLLECTIONS = {
+  "banger-bots": { slug: "banger-bots", output: "public/rarity.json" },
+  "lil-bangers": { slug: "lil-bangers-", output: "public/rarity-lil.json" },
+};
+
 const BASE_URL = "https://api.opensea.io/api/v2";
-const OUTPUT_PATH = "public/rarity.json";
+
+const key = process.argv[2] ?? "banger-bots";
+const collection = COLLECTIONS[key];
+if (!collection) {
+  throw new Error(
+    `Unknown collection "${key}". Known: ${Object.keys(COLLECTIONS).join(", ")}`,
+  );
+}
+
+const { slug: COLLECTION_SLUG, output: OUTPUT_PATH } = collection;
 
 const readApiKey = async () => {
   const env = await readFile(".env", "utf8");
@@ -94,4 +108,4 @@ await writeFile(
 
 const sample = ranked.find((nft) => nft.tokenId === "1");
 console.log(`wrote ${OUTPUT_PATH}: ${ranked.length} nfts`);
-console.log(`sanity check — token #1 rank: ${sample?.rank} (OpenSea says 3445)`);
+console.log(`sanity check — token #1 rank: ${sample?.rank} of ${total}`);

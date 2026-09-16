@@ -1,13 +1,10 @@
-import {
-  CHAIN_ETHEREUM,
-  CONTRACT_ADDRESS,
-  type RarityNft,
-} from "@/api/definitions";
+import type { Collection, RarityNft } from "@/api/definitions";
 import { thumbnailUrl } from "@/lib/image-url";
 
 type NftCardProps = {
   nft: RarityNft;
   total: number;
+  collection: Collection;
 };
 
 const RARITY_TIERS = [
@@ -23,12 +20,12 @@ const rarityClasses = (percentile: number) =>
   RARITY_TIERS.find((tier) => percentile <= tier.maxPercentile)?.classes ??
   COMMON_TIER;
 
-export const NftCard = ({ nft, total }: NftCardProps) => {
+export const NftCard = ({ nft, total, collection }: NftCardProps) => {
   const percentile = nft.rank / total;
 
   return (
     <a
-      href={`https://opensea.io/item/${CHAIN_ETHEREUM}/${CONTRACT_ADDRESS}/${nft.tokenId}`}
+      href={`https://opensea.io/item/${collection.chain}/${collection.contract}/${nft.tokenId}`}
       target="_blank"
       rel="noopener noreferrer"
       title={`View ${nft.name} on OpenSea`}

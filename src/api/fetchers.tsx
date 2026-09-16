@@ -1,11 +1,10 @@
 import { openseaFetch } from "@/lib/opensea-client";
-import {
-  CHAIN_ETHEREUM,
-  COLLECTION_SLUG,
-  type Nft,
-  type OpenSeaNft,
-  type OpenSeaNftsResponse,
-  type RarityData,
+import type {
+  Collection,
+  Nft,
+  OpenSeaNft,
+  OpenSeaNftsResponse,
+  RarityData,
 } from "@/api/definitions";
 
 const toNft = (nft: OpenSeaNft): Nft => ({
@@ -14,15 +13,18 @@ const toNft = (nft: OpenSeaNft): Nft => ({
   image: nft.image_url ?? "",
 });
 
-export const fetchCollectionNfts = async (owner: string): Promise<Nft[]> => {
+export const fetchCollectionNfts = async (
+  collection: Collection,
+  owner: string,
+): Promise<Nft[]> => {
   const nfts: OpenSeaNft[] = [];
   let cursor: string | undefined;
 
   do {
     const data = await openseaFetch<OpenSeaNftsResponse>({
-      path: `/chain/${CHAIN_ETHEREUM}/account/${owner}/nfts`,
+      path: `/chain/${collection.chain}/account/${owner}/nfts`,
       params: {
-        collection: COLLECTION_SLUG,
+        collection: collection.slug,
         limit: "200",
         ...(cursor ? { next: cursor } : {}),
       },
@@ -34,8 +36,10 @@ export const fetchCollectionNfts = async (owner: string): Promise<Nft[]> => {
   return nfts.map(toNft);
 };
 
-export const fetchRarity = async (): Promise<RarityData> => {
-  const response = await fetch("/rarity.json");
+export const fetchRarity = async (
+  collection: Collection,
+): Promise<RarityData> => {
+  const response = await fetch(collection.rarityPath);
   if (!response.ok) {
     throw new Error("Failed to load rarity data");
   }
