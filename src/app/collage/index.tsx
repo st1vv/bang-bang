@@ -99,7 +99,19 @@ export const CollagePage = () => {
         onSubmit={handleAddressSearch}
       />
 
-      <SourcePicker source={source} onChange={handleSourceChange} />
+      {/* Grouped so the two pill rows sit closer to each other than to the
+          rest of the page. */}
+      <div className="flex flex-col items-center gap-3">
+        <SourcePicker source={source} onChange={handleSourceChange} />
+
+        {nfts.length > 0 && (
+          <GridSizePicker
+            columns={columns}
+            isSizeAvailable={isSizeAvailable}
+            onChange={setColumns}
+          />
+        )}
+      </div>
 
       {isLoading && <Spinner />}
 
@@ -124,14 +136,6 @@ export const CollagePage = () => {
             Paste an EVM address above and pick the NFTs for your collage
           </p>
         </div>
-      )}
-
-      {nfts.length > 0 && (
-        <GridSizePicker
-          columns={columns}
-          isSizeAvailable={isSizeAvailable}
-          onChange={setColumns}
-        />
       )}
 
       {nfts.length > 0 && (
