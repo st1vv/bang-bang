@@ -1,6 +1,11 @@
 import type { CollectionNft } from "@/api/definitions";
 
 const CELL_SIZE = 512;
+// Part of both collections carries a 1px dark outline baked into the artwork.
+// Tiled edge to edge those outlines read as seams between cells, so every
+// image gives up a sliver of each side. Small enough to stay invisible: 3px of
+// the 500px the CDN serves.
+export const EDGE_CROP_RATIO = 0.005;
 const MAX_CANVAS_SIZE = 2048;
 const BACKGROUND = "#170f26";
 
@@ -38,8 +43,15 @@ export const renderCollage = async (
   const images = await Promise.all(nfts.map((nft) => loadImage(nft.image)));
 
   images.forEach((image, index) => {
+    const cropX = Math.max(1, Math.ceil(image.naturalWidth * EDGE_CROP_RATIO));
+    const cropY = Math.max(1, Math.ceil(image.naturalHeight * EDGE_CROP_RATIO));
+
     context.drawImage(
       image,
+      cropX,
+      cropY,
+      image.naturalWidth - cropX * 2,
+      image.naturalHeight - cropY * 2,
       (index % columns) * cellSize,
       Math.floor(index / columns) * cellSize,
       cellSize,

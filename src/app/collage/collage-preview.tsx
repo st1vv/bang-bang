@@ -1,10 +1,15 @@
 import type { CollectionNft } from "@/api/definitions";
 import { thumbnailUrl } from "@/lib/image-url";
+import { EDGE_CROP_RATIO } from "@/lib/render-collage";
 
 type CollagePreviewProps = {
   nfts: CollectionNft[];
   columns: number;
 };
+
+// Scaling up by the cropped fraction reproduces the export's inset crop: the
+// overflowing sliver is clipped by the cell.
+const CROP_SCALE = 1 / (1 - 2 * EDGE_CROP_RATIO);
 
 // Mirrors the exported PNG: no gaps, no rounding, empty cells in the same
 // colour the canvas is filled with.
@@ -21,13 +26,18 @@ export const CollagePreview = ({ nfts, columns }: CollagePreviewProps) => {
         // moves the existing images instead of rewriting every later cell's
         // src and decoding them all over again.
         return nft ? (
-          <img
+          <div
             key={`nft-${nft.uid}`}
-            src={thumbnailUrl(nft.image, 250)}
-            alt={nft.name}
-            decoding="async"
-            className="aspect-square w-full object-cover"
-          />
+            className="aspect-square w-full overflow-hidden"
+          >
+            <img
+              src={thumbnailUrl(nft.image, 250)}
+              alt={nft.name}
+              decoding="async"
+              style={{ transform: `scale(${CROP_SCALE})` }}
+              className="size-full object-cover"
+            />
+          </div>
         ) : (
           <div key={`empty-${index}`} className="aspect-square w-full bg-ink" />
         );
