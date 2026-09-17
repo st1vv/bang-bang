@@ -6,6 +6,20 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     isActive ? "text-gold" : "text-white/90 hover:text-cyan"
   }`;
 
+// Full labels plus the logo do not fit on a phone: they wrap mid-name and
+// crowd the logo, so narrow screens get the short form instead.
+type NavLabelProps = {
+  short: string;
+  full: string;
+};
+
+const NavLabel = ({ short, full }: NavLabelProps) => (
+  <>
+    <span className="sm:hidden">{short}</span>
+    <span className="hidden sm:inline">{full}</span>
+  </>
+);
+
 export const Header = () => {
   // Carrying the query string keeps the entered wallet when switching pages.
   const { search } = useLocation();
@@ -17,10 +31,10 @@ export const Header = () => {
       </NavLink>
       <nav className="flex items-center gap-3 lg:gap-4">
         <NavLink to={{ pathname: "/", search }} end className={navLinkClasses}>
-          Banger Bots
+          <NavLabel short="Bots" full="Banger Bots" />
         </NavLink>
         <NavLink to={{ pathname: "/lil", search }} className={navLinkClasses}>
-          Lil&apos; Bangers
+          <NavLabel short="Lil'" full="Lil' Bangers" />
         </NavLink>
         <NavLink
           to={{ pathname: "/collage", search }}
